@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Escape From The Possum Den</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ BOOT / TITLE SCREEN ============ -->
+<div id="title-screen" class="screen">
+  <div class="title-bg"></div>
+  <div class="title-content">
+    <h1 class="game-title">ESCAPE FROM<br><span>THE POSSUM DEN</span></h1>
+    <p class="title-sub">a first-person shooter</p>
+    <div class="title-buttons">
+      <button id="btn-new-game" class="menu-btn">New Game</button>
+      <button id="btn-continue" class="menu-btn">Continue</button>
+      <button id="btn-how-to-play" class="menu-btn">How To Play</button>
+      <button id="btn-settings" class="menu-btn">Settings</button>
+    </div>
+    <p class="title-footer">Click / Tap to begin &mdash; original story, characters &amp; assets</p>
+  </div>
+</div>
+
+<!-- ============ HOW TO PLAY ============ -->
+<div id="howto-screen" class="screen hidden">
+  <div class="panel">
+    <h2>How To Play</h2>
+    <div class="howto-grid">
+      <div>
+        <h3>Keyboard &amp; Mouse</h3>
+        <ul>
+          <li><b>WASD</b> — Move</li>
+          <li><b>Mouse</b> — Look</li>
+          <li><b>Left Click</b> — Shoot</li>
+          <li><b>R</b> — Reload</li>
+          <li><b>Space</b> — Jump</li>
+          <li><b>Shift</b> — Sprint</li>
+          <li><b>Ctrl</b> — Crouch</li>
+          <li><b>1 / 2 / 3</b> — Switch Weapon</li>
+          <li><b>E</b> — Interact</li>
+          <li><b>M</b> — Map</li>
+          <li><b>Esc</b> — Pause</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Touch</h3>
+        <ul>
+          <li>Left stick — Move</li>
+          <li>Drag right side — Look</li>
+          <li>Buttons — Shoot / Reload / Jump / Switch / Map</li>
+        </ul>
+        <h3>Controller</h3>
+        <ul>
+          <li>Left Stick — Move</li>
+          <li>Right Stick — Look</li>
+          <li>RT — Shoot, X/Square — Reload</li>
+          <li>Y/Triangle — Switch, B/Circle — Interact</li>
+          <li>Start — Pause, Select — Map</li>
+        </ul>
+      </div>
+    </div>
+    <p class="howto-tip">Find keys to open locked doors. Explore for secrets, ammo and health. Standing still gets you killed — strafe, dodge, and keep moving.</p>
+    <button class="menu-btn" id="btn-howto-back">Back</button>
+  </div>
+</div>
+
+<!-- ============ SETTINGS ============ -->
+<div id="settings-screen" class="screen hidden">
+  <div class="panel">
+    <h2>Settings</h2>
+    <div class="settings-row">
+      <label>Mouse Sensitivity</label>
+      <input type="range" id="sens-slider" min="1" max="20" value="8">
+    </div>
+    <div class="settings-row">
+      <label>Music</label>
+      <input type="checkbox" id="music-toggle" checked>
+    </div>
+    <div class="settings-row">
+      <label>Sound Effects</label>
+      <input type="checkbox" id="sfx-toggle" checked>
+    </div>
+    <div class="settings-row">
+      <label>Master Mute</label>
+      <input type="checkbox" id="mute-toggle">
+    </div>
+    <div class="settings-row">
+      <label>Field of View</label>
+      <input type="range" id="fov-slider" min="70" max="110" value="88">
+    </div>
+    <div class="settings-row">
+      <button class="menu-btn danger" id="btn-reset-save">Reset Save Data</button>
+    </div>
+    <button class="menu-btn" id="btn-settings-back">Back</button>
+  </div>
+</div>
+
+<!-- ============ CONFIRM DIALOG ============ -->
+<div id="confirm-dialog" class="screen hidden">
+  <div class="panel small">
+    <p id="confirm-text">Are you sure?</p>
+    <div class="confirm-buttons">
+      <button id="confirm-yes" class="menu-btn danger">Yes</button>
+      <button id="confirm-no" class="menu-btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ GAME CANVAS ============ -->
+<canvas id="game-canvas"></canvas>
+
+<!-- ============ HUD ============ -->
+<div id="hud" class="hidden">
+  <div class="crosshair" id="crosshair"></div>
+
+  <div id="boss-bar-wrap" class="hidden">
+    <div class="boss-name" id="boss-name">BOSS</div>
+    <div class="boss-bar-bg"><div class="boss-bar-fill" id="boss-bar-fill"></div></div>
+  </div>
+
+  <div id="hit-marker" class="hit-marker"></div>
+  <div id="damage-flash" class="damage-flash"></div>
+  <div id="pickup-toast" class="pickup-toast"></div>
+  <div id="interact-prompt" class="interact-prompt hidden">Press E</div>
+
+  <div class="hud-bottom">
+    <div class="hud-left">
+      <div class="stat"><span class="stat-icon">&#10084;</span><span id="hp-val">100</span></div>
+      <div class="stat"><span class="stat-icon">&#9679;</span><span id="currency-val">0</span></div>
+    </div>
+    <div class="hud-right">
+      <div id="weapon-name">PISTOL</div>
+      <div id="ammo-val">8 / &#8734;</div>
+      <div id="reload-indicator" class="hidden">RELOADING</div>
+    </div>
+  </div>
+
+  <div class="hud-top-left">
+    <div id="level-name">THE BURROW</div>
+    <div id="objective-text"></div>
+  </div>
+
+  <div id="key-icons"></div>
+</div>
+
+<!-- ============ MAP OVERLAY ============ -->
+<div id="map-overlay" class="screen hidden">
+  <div class="panel">
+    <h2 id="map-title">MAP — THE BURROW</h2>
+    <canvas id="map-canvas" width="600" height="600"></canvas>
+    <button class="menu-btn" id="btn-map-close">Close (M)</button>
+  </div>
+</div>
+
+<!-- ============ PAUSE MENU ============ -->
+<div id="pause-screen" class="screen hidden">
+  <div class="panel">
+    <h2>Paused</h2>
+    <button class="menu-btn" id="btn-resume">Resume</button>
+    <button class="menu-btn" id="btn-pause-settings">Settings</button>
+    <button class="menu-btn danger" id="btn-quit-title">Quit to Title</button>
+  </div>
+</div>
+
+<!-- ============ SHOP ============ -->
+<div id="shop-screen" class="screen hidden">
+  <div class="panel">
+    <h2>Supply Cache</h2>
+    <p class="shop-currency">Scrap: <span id="shop-currency-val">0</span></p>
+    <div class="shop-grid" id="shop-grid"></div>
+    <button class="menu-btn" id="btn-shop-close">Leave</button>
+  </div>
+</div>
+
+<!-- ============ CUTSCENE ============ -->
+<div id="cutscene-screen" class="screen hidden">
+  <div class="cutscene-content">
+    <div class="cutscene-portrait" id="cutscene-portrait"></div>
+    <p id="cutscene-text"></p>
+  </div>
+  <button id="btn-cutscene-skip" class="menu-btn skip-btn">Skip &raquo;</button>
+</div>
+
+<!-- ============ CHOICE SCREEN ============ -->
+<div id="choice-screen" class="screen hidden">
+  <div class="panel">
+    <h2>The Den is collapsing.</h2>
+    <p>Liam lies before you. The exit tunnel groans and shudders behind you.</p>
+    <div class="choice-buttons">
+      <button class="menu-btn choice-btn" id="btn-choice-escape">End Liam and Escape</button>
+      <button class="menu-btn choice-btn" id="btn-choice-stay">Become a Possum</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DEATH SCREEN ============ -->
+<div id="death-screen" class="screen hidden">
+  <div class="panel">
+    <h2 class="death-title">YOU DIED</h2>
+    <button class="menu-btn" id="btn-respawn">Respawn at Checkpoint</button>
+    <button class="menu-btn danger" id="btn-death-title">Quit to Title</button>
+  </div>
+</div>
+
+<!-- ============ END CREDITS ============ -->
+<div id="credits-screen" class="screen hidden">
+  <div class="panel">
+    <h2 id="ending-title">ENDING</h2>
+    <div id="credits-text" class="credits-text"></div>
+    <button class="menu-btn" id="btn-credits-title">Return to Title</button>
+  </div>
+</div>
+
+<!-- ============ TOUCH CONTROLS ============ -->
+<div id="touch-controls" class="hidden">
+  <div id="touch-move-zone" class="touch-zone left">
+    <div id="touch-move-stick" class="touch-stick"></div>
+  </div>
+  <div id="touch-look-zone" class="touch-zone right"></div>
+  <div class="touch-buttons">
+    <button id="touch-jump" class="touch-btn">JUMP</button>
+    <button id="touch-crouch" class="touch-btn">CR</button>
+    <button id="touch-reload" class="touch-btn">R</button>
+    <button id="touch-switch" class="touch-btn">SW</button>
+    <button id="touch-interact" class="touch-btn">E</button>
+    <button id="touch-map" class="touch-btn">MAP</button>
+    <button id="touch-pause" class="touch-btn">II</button>
+    <button id="touch-fire" class="touch-btn fire">FIRE</button>
+  </div>
+</div>
+
+<div id="loading-screen" class="screen hidden">
+  <div class="loading-text">Loading The Possum Den&hellip;</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
